@@ -10,7 +10,8 @@ Responsabilidad:
 Este archivo conecta todos los sistemas.
 """
 import pygame
-from core.state_manager import StateManager from core.clock import Clock
+from core.state_manager import StateManager 
+from core.clock import Clock
 from ui.menu import Menu
 from ui.hud import HUD
 from ui.meeting import Meeting
@@ -18,7 +19,7 @@ from entities.player import Player
 from systems.input_system import InputSystem
 from systems.movement_system import MovementSystem
 from systems.interaction_system import InteractionSystem
-from systems.npc_system import NPCSystem
+from systems.npc_system import NPCSystem    
 from systems.task_system import TaskSystem
 from systems.sabotage_system import SabotageSystem
 from data import load_npcs, load_tasks
@@ -50,7 +51,7 @@ class Game:
                         running = False
                 if self.state_manager.state == StateManager.MENU:
                     self.menu.update()
-                    .menu.draw(self.screen)
+                    self.menu.draw(self.screen)
                 elif self.state_manager.state == StateManager.PLAYING:
                     self.input_system.update(self.player)
                     self.movement_system.update(self.player, self.npcs)
