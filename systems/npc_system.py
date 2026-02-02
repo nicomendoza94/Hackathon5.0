@@ -6,3 +6,7 @@ Responsabilidad:
 - Cambiar estados (trabajo, sospecha, idle)
 - Controlar NPC impostor
 """
+class NPCSystem: 
+    def update(self, npcs): 
+        for npc in npcs: 
+            npc.update() 
