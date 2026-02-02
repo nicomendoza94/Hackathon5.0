@@ -1,3 +1,39 @@
 {
-  "npcs": []
+  "npcs": [
+    {
+      "id": 1,
+      "name": "Diputado A",
+      "x": 5,
+      "y": 3,
+      "is_impostor": false
+    },
+    {
+      "id": 2,
+      "name": "Diputado B",
+      "x": 10,
+      "y": 8,
+      "is_impostor": true
+    },
+    {
+      "id": 3,
+      "name": "Diputado C",
+      "x": 2,
+      "y": 7,
+      "is_impostor": false
+    },
+    {
+      "id": 4,
+      "name": "Diputado D",
+      "x": 8,
+      "y": 1,
+      "is_impostor": false
+    },
+    {
+      "id": 5,
+      "name": "Diputado E",
+      "x": 4,
+      "y": 5,
+      "is_impostor": true
+    }
+  ]
 }
