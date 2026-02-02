@@ -1,3 +1,6 @@
-{
-  "npcs": []
-}
+
+
+[
+  {"name": "Diputado Camaleon", "x": 200, "y": 200},
+  {"name": "Senador del Aire", "x": 400, "y": 300}
+]

@@ -1,10 +1,14 @@
-"""
-Configuración global del juego.
+# config.py
+# Configuraciones globales
 
-Responsabilidad:
-- Constantes generales (FPS, tamaño de pantalla, colores)
-- Títulos del juego
-- Parámetros que se usan en todo el proyecto
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+TITLE = "El Impostor en el Congreso (PY)"
+FPS = 60
 
-No debe contener lógica, solo constantes.
-"""
+# Colores
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)

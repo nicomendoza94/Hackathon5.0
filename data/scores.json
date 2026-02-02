@@ -1,4 +1,4 @@
 {
-  "_comment": "Datos persistentes de puntajes",
-  "best_score": 0
+  "partidas_ganadas": 0,
+  "tareas_totales": 0
 }

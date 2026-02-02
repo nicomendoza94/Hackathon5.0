@@ -1,4 +1,5 @@
-{
-  "_comment": "Definición de tareas del Congreso",
-  "tasks": []
-}
+[
+  {"name": "Firmar presupuesto", "x": 150, "y": 100},
+  {"name": "Revisar informe", "x": 500, "y": 450}
+]
+
