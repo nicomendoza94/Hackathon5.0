@@ -6,3 +6,7 @@ Responsabilidad:
 - Aplicar efectos negativos al juego
 - Incrementar dificultad
 """
+class SabotageSystem:
+    def update(self, player, npcs, tasks):
+        # Sabotajes del impostor
+        pass
