@@ -14,6 +14,7 @@ SCREEN_WIDTH = 1200
 TITLE = "El Impostor en el Congrerso (PY)"
 
 FPS = 60 
+GAME_TIME = 300 # segundos
 
 # Colores
 WHITE = (255, 255, 255)
