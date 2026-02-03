@@ -58,30 +58,25 @@ class Game:
         self.tasks = load_tasks()
         self.npc_system.npcs = self.npcs
 
-        # Ajuste total_tasks a JSON
         self.player.total_tasks = len(self.tasks)
 
-        # Variables de match
         self.timer_seconds = 300.0
         self.score = 0
 
-        # Nuevas barras
-        self.stress = 0.0      # 0..100
-        self.suspicion = 0.0   # 0..100
+        self.stress = 0.0
+        self.suspicion = 0.0
 
-        # Sabotajes estado
         self.lights_out = False
         self.doors_locked = False
 
         # ----------------------------
-        # VISUALES (MAPA OPEN/CLOSED)
+        # MAPA OPEN/CLOSED
         # ----------------------------
         w, h = self.screen.get_width(), self.screen.get_height()
 
         self.map_open = _safe_load_image("assets/images/map_open.png", size=(w, h), alpha=False)
         self.map_closed = _safe_load_image("assets/images/map_closed.png", size=(w, h), alpha=False)
 
-        # Fallback seguro (pero vos querés que cargue sí o sí: esto te evita crash)
         if self.map_open is None:
             print("⚠️ map_open.png no encontrada o inválida. Revisá formato/ubicación.")
             self.map_open = pygame.Surface((w, h))
@@ -91,35 +86,29 @@ class Game:
             print("⚠️ map_closed.png no encontrada o inválida. Usando map_open como reemplazo.")
             self.map_closed = self.map_open.copy()
 
-        # bg actual
         self.bg = self.map_open
 
         # Sprites
-        self.player_sprite = _safe_load_image("assets/images/player.png", size=(72, 72), alpha=True)
+        # ✅ si querés aún más grande, subí a (80,80) o (96,96)
+        self.player_sprite = _safe_load_image("assets/images/player.png", size=(80, 80), alpha=True)
         self.npc_sprite = _safe_load_image("assets/images/npc.png", size=(44, 44), alpha=True)
 
         self.font_hint = pygame.font.SysFont("Verdana", 20, bold=True)
 
         # ============================================================
-        # WALLS + DOORS (ÚLTIMOS AJUSTES para tus imágenes 1280x720)
-        # - Pared del medio más abajo
-        # - Puerta izq más a la izquierda y más ancha
-        # - Puerta der más a la derecha y más ancha
-        # - SIN “postes” verticales (eran paredes invisibles)
+        # WALLS + DOORS
         # ============================================================
         wall_y, wall_h = 308, 22
 
-        left_gap_x = 90 
+        left_gap_x = 90
         gap_w = 160
         right_gap_x = 1030
 
-        # Pared horizontal en 3 segmentos + bordes del mapa
         self.walls = [
             pygame.Rect(0, wall_y, left_gap_x, wall_h),
             pygame.Rect(left_gap_x + gap_w, wall_y, right_gap_x - (left_gap_x + gap_w), wall_h),
             pygame.Rect(right_gap_x + gap_w, wall_y, 1280 - (right_gap_x + gap_w), wall_h),
 
-            # bordes
             pygame.Rect(0, 0, 1280, 8),
             pygame.Rect(0, 712, 1280, 8),
             pygame.Rect(0, 0, 8, 720),
@@ -132,7 +121,6 @@ class Game:
             pygame.Rect(right_gap_x, wall_y - pad_y, gap_w, wall_h + pad_y * 2),
         ]
 
-        # Spawns seguros (evitan quedar trabado)
         self.safe_spawns = [
             (640, 560),
             (160, 140),
@@ -144,11 +132,9 @@ class Game:
         self._assign_random_impostor()
         self._spawn_player_safely()
 
-        # Debug colisiones (ponelo True si querés ver rects)
         self.debug_colliders = False
 
     def _assign_random_impostor(self):
-        # reset
         self.player.is_impostor = False
         self.player.role = "Diputado"
         for npc in self.npcs:
@@ -201,9 +187,23 @@ class Game:
         self._assign_random_impostor()
         self._spawn_player_safely()
 
-        # reset de mapa
         self.doors_locked = False
         self.bg = self.map_open
+
+    # ✅ pantalla final
+    def _draw_end_screen(self, win):
+        self.screen.fill((10, 10, 15))
+        font_big = pygame.font.SysFont("Verdana", 56, bold=True)
+        font_small = pygame.font.SysFont("Verdana", 28, bold=True)
+
+        title = "GANASTE 🎉" if win else "PERDISTE 💀"
+        subtitle = "Presioná ESPACIO para volver al menú"
+
+        t = font_big.render(title, True, (0, 220, 0) if win else (220, 60, 60))
+        s = font_small.render(subtitle, True, (200, 200, 200))
+
+        self.screen.blit(t, (640 - t.get_width() // 2, 260))
+        self.screen.blit(s, (640 - s.get_width() // 2, 340))
 
     def run(self):
         running = True
@@ -220,6 +220,9 @@ class Game:
                     self._handle_playing_events(event)
                 elif self.state_manager.state == StateManager.MEETING:
                     self._handle_meeting_events(event)
+                elif self.state_manager.state in (StateManager.WIN, StateManager.GAME_OVER):
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                        self.state_manager.set_state(StateManager.MENU)
 
             if self.state_manager.state == StateManager.MENU:
                 self.menu.draw()
@@ -232,8 +235,10 @@ class Game:
                     "No hay voto: gestionás el caos.",
                 ]
                 self.meeting.draw(self.stress, self.suspicion, info)
-            elif self.state_manager.state in (StateManager.GAME_OVER, StateManager.WIN):
-                self.menu.draw()
+            elif self.state_manager.state == StateManager.WIN:
+                self._draw_end_screen(True)
+            elif self.state_manager.state == StateManager.GAME_OVER:
+                self._draw_end_screen(False)
 
             pygame.display.flip()
 
@@ -245,7 +250,6 @@ class Game:
             self.state_manager.set_state(StateManager.PLAYING)
 
     def _handle_playing_events(self, event):
-        # Eventos del minijuego
         if self.task_system.minigame_active:
             completed = self.task_system.handle_minigame_event(event)
             if completed:
@@ -260,11 +264,9 @@ class Game:
             if event.key == pygame.K_ESCAPE and self.task_system.minigame_active:
                 self.task_system.cancel_minigame()
 
-            # Reunión de emergencia
             if event.key == pygame.K_m and not self.task_system.minigame_active:
                 self.state_manager.set_state(StateManager.MEETING)
 
-            # DEBUG (toggle colliders)
             if event.key == pygame.K_F3:
                 self.debug_colliders = not self.debug_colliders
 
@@ -272,9 +274,7 @@ class Game:
         if event.type != pygame.KEYDOWN:
             return
 
-        # 1) Restablecer orden
         if event.key == pygame.K_1:
-            # Limpia sabotajes activos
             for s in self.sabotage_system.sabotages:
                 s.deactivate()
 
@@ -287,32 +287,26 @@ class Game:
             self.state_manager.set_state(StateManager.PLAYING)
 
     def _update_playing(self, dt):
-        # TIMER
         self.timer_seconds -= dt / 1000.0
         if self.timer_seconds <= 0:
             self.timer_seconds = 0
 
-            # Si sos diputado y completaste tareas -> WIN, si no -> LOSE
             if (not self.player.is_impostor) and self.player.tasks_completed >= self.player.total_tasks:
                 self.state_manager.set_state(StateManager.WIN)
             else:
-                # Para impostor, tiempo agotado sin tareas completas = GANAR
                 if self.player.is_impostor and self.player.tasks_completed < self.player.total_tasks:
                     self.state_manager.set_state(StateManager.WIN)
                 else:
                     self.state_manager.set_state(StateManager.GAME_OVER)
             return
 
-        # Sabotajes update
         self.sabotage_system.update(self.player, self.npcs, self.tasks)
 
         self.lights_out = any(s.active and s.effect == "lights" for s in self.sabotage_system.sabotages)
         self.doors_locked = any(s.active and s.effect == "doors" for s in self.sabotage_system.sabotages)
 
-        # ✅ MAPA SEGÚN PUERTAS
         self.bg = self.map_closed if self.doors_locked else self.map_open
 
-        # Estrés sube por sabotajes activos
         active_count = sum(1 for s in self.sabotage_system.sabotages if s.active)
         self.stress += (active_count * 1.6) * (dt / 1000.0)
         if self.doors_locked:
@@ -320,26 +314,21 @@ class Game:
         if self.lights_out:
             self.stress += 0.6 * (dt / 1000.0)
 
-        # NPCs reaccionan
         npc_effects = self.npc_system.update(dt, self.player, self.tasks, self.doors_locked, self.lights_out)
         self.stress += npc_effects.get("stress_add", 0.0)
         self.suspicion += npc_effects.get("suspicion_add", 0.0)
 
-        # Meeting automático si sos impostor y te detectan
         if self.player.is_impostor and npc_effects.get("meeting_requested", False):
             self.state_manager.set_state(StateManager.MEETING)
 
-        # sospecha decae
         if not self.player.is_impostor:
             self.suspicion = max(0.0, self.suspicion - 12.0 * (dt / 1000.0))
         else:
             self.suspicion = max(0.0, self.suspicion - 3.0 * (dt / 1000.0))
 
-        # clamp
         self.stress = max(0.0, min(100.0, self.stress))
         self.suspicion = max(0.0, min(100.0, self.suspicion))
 
-        # Derrotas/Victorias por barras
         if self.stress >= 100.0:
             self.state_manager.set_state(StateManager.WIN if self.player.is_impostor else StateManager.GAME_OVER)
             return
@@ -348,7 +337,6 @@ class Game:
             self.state_manager.set_state(StateManager.GAME_OVER if self.player.is_impostor else StateManager.WIN)
             return
 
-        # Movimiento player con colisiones
         if not self.task_system.minigame_active:
             prev_x, prev_y = self.player.x, self.player.y
             prev_rect = self.player.rect.copy()
@@ -360,7 +348,6 @@ class Game:
                 self.player.x, self.player.y = prev_x, prev_y
                 self.player.rect = prev_rect
 
-        # Minijuego update
         completed_from_update = self.task_system.update_minigame()
         if completed_from_update:
             self.player.complete_task()
@@ -369,26 +356,23 @@ class Game:
 
         self.task_system.update(self.player, self.tasks)
 
-        # WIN diputado por tareas
         if (not self.player.is_impostor) and self.player.tasks_completed >= self.player.total_tasks:
             self.state_manager.set_state(StateManager.WIN)
             return
 
     def _draw_playing(self):
-        # Fondo
         if self.bg:
             self.screen.blit(self.bg, (0, 0))
         else:
             self.screen.fill((40, 40, 45))
 
-        # NPCs (sin revelar impostor)
+        # NPCs
         for npc in self.npcs:
             if self.npc_sprite:
                 self.screen.blit(self.npc_sprite, (int(npc.x) - 22, int(npc.y) - 22))
             else:
                 pygame.draw.circle(self.screen, (0, 140, 255), (int(npc.x), int(npc.y)), 16)
 
-            # barra sospecha individual
             bar_w, bar_h = 40, 6
             x = int(npc.x) - bar_w // 2
             y = int(npc.y) - 30
@@ -396,13 +380,15 @@ class Game:
             fill = int(bar_w * (max(0.0, min(100.0, getattr(npc, "suspicion", 0.0))) / 100.0))
             pygame.draw.rect(self.screen, (255, 80, 80), (x, y, fill, bar_h))
 
-        # Player
+        # ✅ Player (centrado siempre, no hardcode)
         if self.player_sprite:
-            self.screen.blit(self.player_sprite, (int(self.player.x) - 36, int(self.player.y) - 36))
+            sw = self.player_sprite.get_width()
+            sh = self.player_sprite.get_height()
+            self.screen.blit(self.player_sprite, (int(self.player.x - sw // 2), int(self.player.y - sh // 2)))
         else:
             pygame.draw.circle(self.screen, (0, 255, 0), (int(self.player.x), int(self.player.y)), 18)
 
-        # Hint "E"
+        # Hint
         near_task = self.interaction_system.check_task_interaction(self.player, self.tasks)
         if near_task and not self.task_system.minigame_active and not near_task.completed:
             hint = self.font_hint.render("Presioná E para hacer tarea", True, (255, 255, 255))
@@ -427,17 +413,18 @@ class Game:
             suspicion=self.suspicion,
         )
 
-        # Mensajes UI del sabotage system
+        # ✅ MENSAJES tipo BANNER (arriba centrado)
         msgs = self.sabotage_system.get_ui_messages() if hasattr(self.sabotage_system, "get_ui_messages") else []
         if msgs:
-            font_msg = pygame.font.SysFont("Verdana", 18, bold=True)
-            y = 86
-            for m in msgs[-3:]:
-                s = font_msg.render(m, True, (255, 255, 255))
-                sh = font_msg.render(m, True, (0, 0, 0))
-                self.screen.blit(sh, (26, y + 2))
-                self.screen.blit(s, (24, y))
-                y += 24
+            font_msg = pygame.font.SysFont("Verdana", 22, bold=True)
+            y = 90
+            for msg in msgs[-2:]:
+                surf = font_msg.render(msg, True, (255, 255, 255))
+                shadow = font_msg.render(msg, True, (0, 0, 0))
+                x = self.screen.get_width() // 2 - surf.get_width() // 2
+                self.screen.blit(shadow, (x + 2, y + 2))
+                self.screen.blit(surf, (x, y))
+                y += 34
 
         # Luces apagadas
         if self.lights_out:
@@ -447,7 +434,7 @@ class Game:
 
             font = pygame.font.SysFont("Verdana", 26, bold=True)
             msg = font.render("SABOTAJE: LUCES APAGADAS", True, (255, 90, 90))
-            self.screen.blit(msg, (self.screen.get_width() // 2 - msg.get_width() // 2, 120))
+            self.screen.blit(msg, (self.screen.get_width() // 2 - msg.get_width() // 2, 140))
 
         # DEBUG colisiones (F3)
         if self.debug_colliders:

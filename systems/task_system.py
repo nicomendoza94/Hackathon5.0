@@ -22,7 +22,8 @@ class TaskSystem:
         self.review_clicks = 0
 
         self.mic_position = 50
-        self.mic_target = random.randint(0, 100)
+        # ✅ target con rango más amplio
+        self.mic_target = random.randint(30, 70)
         self.mic_speed = 2
 
         self.empanadas_orders = self._generate_orders()
@@ -37,7 +38,6 @@ class TaskSystem:
         self.sleep_start_time = 0
 
     def update(self, player, tasks):
-        # (por ahora no hace nada visual)
         pass
 
     def try_start_task(self, player, tasks):
@@ -62,7 +62,8 @@ class TaskSystem:
 
         elif task.task_type == "mic":
             self.mic_position = 50
-            self.mic_target = random.randint(40, 60)
+            # ✅ target con rango más amplio (cada vez que inicia)
+            self.mic_target = random.randint(30, 70)
 
         elif task.task_type == "empanadas":
             self.empanadas_orders = self._generate_orders()
@@ -219,9 +220,9 @@ class TaskSystem:
         start_x, start_y = 100, 150
         x, y = start_x, start_y
 
+        # ✅ NO resaltar "error" en rojo
         for word in self.review_text:
-            color = WHITE
-            word_surf = self.font_small.render(word, True, color)
+            word_surf = self.font_small.render(word, True, WHITE)
             screen.blit(word_surf, (x, y))
 
             x += word_surf.get_width() + 10
@@ -243,7 +244,8 @@ class TaskSystem:
 
     def _handle_mic_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            if abs(self.mic_position - self.mic_target) < 5:
+            # ✅ más tolerante
+            if abs(self.mic_position - self.mic_target) < 12:
                 self.complete_minigame()
                 return True
         return False
@@ -269,7 +271,8 @@ class TaskSystem:
 
     # ========= EMPANADAS =========
     def _generate_orders(self):
-        types = ["carne", "pollo", "jamon y queso", "choclo"]
+        # ✅ sabores pedidos
+        types = ["carne", "pollo", "jamon y queso", "4 quesos"]
         return [random.choice(types) for _ in range(5)]
 
     def _update_empanadas(self):
@@ -295,7 +298,7 @@ class TaskSystem:
                     pygame.K_1: "carne",
                     pygame.K_2: "pollo",
                     pygame.K_3: "jamon y queso",
-                    pygame.K_4: "choclo"
+                    pygame.K_4: "4 quesos"
                 }
 
                 if event.key in key_map and key_map[event.key] == target:
@@ -310,8 +313,8 @@ class TaskSystem:
         title = self.font_large.render("Repartir Empanadas", True, WHITE)
         screen.blit(title, (SCREEN_WIDTH//2 - 220, 50))
 
-        instruction = self.font_small.render("1:Carne 2:Pollo 3:Jamon y Queso 4:Choclo", True, WHITE)
-        screen.blit(instruction, (SCREEN_WIDTH//2 - 190, 120))
+        instruction = self.font_small.render("1:Carne 2:Pollo 3:Jamon y Queso 4:4 Quesos", True, WHITE)
+        screen.blit(instruction, (SCREEN_WIDTH//2 - 220, 120))
 
         current_time = pygame.time.get_ticks()
         elapsed = (current_time - self.empanadas_start_time) / 1000
@@ -324,14 +327,12 @@ class TaskSystem:
         for i, order in enumerate(self.empanadas_orders):
             color = GREEN if i < self.empanadas_completed else WHITE
             order_text = self.font_medium.render(f"{i+1}. {order.capitalize()}", True, color)
-            screen.blit(order_text, (SCREEN_WIDTH//2 - 100, y))
+            screen.blit(order_text, (SCREEN_WIDTH//2 - 120, y))
             y += 40
 
-    # ========= SLEEP (FIX REAL) =========
+    # ========= SLEEP =========
     def _update_sleep(self):
-        # La energía ya NO se resetea cada frame.
-        # Se drena gradualmente, y los clicks la suben.
-        self.sleep_energy -= 0.6  # ajustá: más alto = más difícil
+        self.sleep_energy -= 0.6
 
         current_time = pygame.time.get_ticks()
         elapsed = (current_time - self.sleep_start_time) / 1000
@@ -341,7 +342,6 @@ class TaskSystem:
             self.cancel_minigame()
             return False
 
-        # si aguantó el tiempo, gana
         if elapsed >= self.sleep_duration:
             self.complete_minigame()
             return True

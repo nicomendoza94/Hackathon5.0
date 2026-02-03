@@ -6,24 +6,32 @@ Responsabilidad:
 - Indicar si están activos o no
 - Proveer efectos al sistema de sabotajes
 """
+import pygame
+
+
 class Sabotage:
-    def __init__(self, name, effect, duration, active=False):
-        self.name = name              # Nombre del sabotaje
-        self.effect = effect          # Qué afecta (luces, puertas, etc.)
-        self.duration = duration      # Cuánto dura
-        self.active = active          # Está activo o no
-        self.timer = 0                # Contador interno
+    def __init__(self, name, effect, duration_seconds, active=False):
+        self.name = name
+        self.effect = effect
+
+        # ✅ duración real
+        self.duration_ms = int(duration_seconds * 1000)
+
+        self.active = active
+        self.started_ms = 0
 
     def activate(self):
         self.active = True
-        self.timer = self.duration
+        self.started_ms = pygame.time.get_ticks()
 
     def update(self):
-        if self.active:
-            self.timer -= 1
-            if self.timer <= 0:
-                self.deactivate()
+        if not self.active:
+            return
+
+        now = pygame.time.get_ticks()
+        if now - self.started_ms >= self.duration_ms:
+            self.deactivate()
 
     def deactivate(self):
         self.active = False
-        self.timer = 0
+        self.started_ms = 0
