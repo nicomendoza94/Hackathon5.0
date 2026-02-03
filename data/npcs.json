@@ -2,38 +2,38 @@
   "npcs": [
     {
       "id": 1,
-      "name": "Diputado A",
-      "x": 5,
-      "y": 3,
+      "name": "Diputado Pérez",
+      "x": 300,
+      "y": 250,
       "is_impostor": false
     },
     {
       "id": 2,
-      "name": "Diputado B",
-      "x": 10,
-      "y": 8,
+      "name": "Senador González",
+      "x": 500,
+      "y": 350,
       "is_impostor": true
     },
     {
       "id": 3,
-      "name": "Diputado C",
-      "x": 2,
-      "y": 7,
+      "name": "Diputada Martínez",
+      "x": 700,
+      "y": 450,
       "is_impostor": false
     },
     {
       "id": 4,
-      "name": "Diputado D",
-      "x": 8,
-      "y": 1,
+      "name": "Diputado López",
+      "x": 400,
+      "y": 550,
       "is_impostor": false
     },
     {
       "id": 5,
-      "name": "Diputado E",
-      "x": 4,
-      "y": 5,
-      "is_impostor": true
+      "name": "Senadora Ramírez",
+      "x": 600,
+      "y": 300,
+      "is_impostor": false
     }
   ]
 }
