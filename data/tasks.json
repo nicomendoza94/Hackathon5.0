@@ -1,4 +1,40 @@
 {
-  "_comment": "Definición de tareas del Congreso",
-  "tasks": []
+  "_comment": "Definición de tareas del Congreso con las 5 minijuegos",
+  "tasks": [
+    {
+      "name": "Firmar presupuesto",
+      "x": 200,
+      "y": 200,
+      "task_type": "sign",
+      "difficulty": 1
+    },
+    {
+      "name": "Revisar informe",
+      "x": 400,
+      "y": 300,
+      "task_type": "review",
+      "difficulty": 2
+    },
+    {
+      "name": "Ajustar micrófono",
+      "x": 600,
+      "y": 200,
+      "task_type": "mic",
+      "difficulty": 1
+    },
+    {
+      "name": "Repartir empanadas",
+      "x": 800,
+      "y": 400,
+      "task_type": "empanadas",
+      "difficulty": 3
+    },
+    {
+      "name": "Mantener despierto",
+      "x": 300,
+      "y": 500,
+      "task_type": "sleep",
+      "difficulty": 2
+    }
+  ]
 }
