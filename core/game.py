@@ -22,7 +22,18 @@ from systems.interaction_system import InteractionSystem
 from systems.npc_system import NPCSystem    
 from systems.task_system import TaskSystem
 from systems.sabotage_system import SabotageSystem
-from data import load_npcs, load_tasks
+# from data import load_npcs, load_tasks
+# ===============
+# SACAR DESPUES: BEGIN
+def load_npcs():
+    return {}
+def load_tasks():
+    return {}
+# SACAR DESPUES: END
+# ===============
+
+
+
 class Game:
     def __init__(self, screen):
         self.screen = screen

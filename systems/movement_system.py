@@ -6,3 +6,7 @@ Responsabilidad:
 - Detectar colisiones con paredes y obstáculos
 - Aplicar límites del mapa
 """
+class MovementSystem:
+    #PLACEHOLDER
+    def __init__(self):
+        pass

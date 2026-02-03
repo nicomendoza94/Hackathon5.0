@@ -7,3 +7,7 @@ Responsabilidad:
 - Posición, movimiento y estado
 - Progreso de tareas
 """
+class Player:
+    # PALCEHOLDER
+    def __init__(self):
+        pass
