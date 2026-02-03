@@ -37,5 +37,5 @@ class Menu:
         self.screen.blit(titulo, rect_titulo)
 
         # Instrucción
-        inst = self.font_opciones.render("Presiona '2' para iniciar la sesión", True, (255, 255, 255))
+        inst = self.font_opciones.render("Presiona ESPACIO para iniciar la sesión", True, (255, 255, 255))
         self.screen.blit(inst, inst.get_rect(center=(self.screen.get_width()//2, 450)))

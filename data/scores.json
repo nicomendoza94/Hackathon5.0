@@ -1,0 +1,51 @@
+{
+    "high_scores": [
+        {
+            "player": "Jeremy",
+            "points": 1500,
+            "date": "2026-02-02",
+            "role": "Impostor",
+            "level_reached": 3,
+            "victory": true
+        },
+        {
+            "player": "Jeremy",
+            "points": 405,
+            "date": "2026-02-03",
+            "role": "Ciudadano",
+            "victory": false,
+            "level_reached": 1
+        },
+        {
+            "player": "Jeremy",
+            "points": 190,
+            "date": "2026-02-03",
+            "role": "Ciudadano",
+            "victory": false,
+            "level_reached": 1
+        },
+        {
+            "player": "Jeremy",
+            "points": 170,
+            "date": "2026-02-03"
+        },
+        {
+            "player": "Jeremy",
+            "points": 170,
+            "date": "2026-02-03",
+            "role": "Ciudadano",
+            "victory": true,
+            "level_reached": 1
+        },
+        {
+            "player": "Jeremy",
+            "points": 45,
+            "date": "2026-02-03",
+            "role": "Ciudadano",
+            "victory": false,
+            "level_reached": 1
+        }
+    ],
+    "total_games_played": 9,
+    "total_victories": 1
+}

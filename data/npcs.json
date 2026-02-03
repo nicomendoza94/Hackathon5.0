@@ -1,0 +1,8 @@
+[
+  { "id": 1, "name": "Diputado Mita'i", "is_impostor": false },
+  { "id": 2, "name": "Senador Coimero", "is_impostor": true },
+  { "id": 3, "name": "Dra. Transparencia", "is_impostor": false },
+  { "id": 4, "name": "Lic. Oparei", "is_impostor": false },
+  { "id": 5, "name": "Gral. Tekorei", "is_impostor": false },
+  { "id": 6, "name": "Ing. Vyrorei", "is_impostor": false }
+]

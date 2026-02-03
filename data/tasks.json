@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    { "id": "presupuesto", "label": "Aprobar Presupuesto", "value": 20 },
+    { "id": "empanada", "label": "Desayuno de Trabajo", "value": 10 },
+    { "id": "microfono", "label": "Arreglar Micrófono", "value": 15 },
+    { "id": "aire", "label": "Cargar Gas al Aire", "value": 25 },
+    { "id": "firmar", "label": "Firmar Asistencia", "value": 5 }
+  ],
+  "sabotages": [
+    { "id": "luz", "label": "Cortar la luz del Congreso" },
+    { "id": "cumbia", "label": "Parlantes con Cumbia" },
+    { "id": "huelga", "label": "Manifestación Afuera" },
+    { "id": "voto", "label": "Alterar Voto Cantado" },
+    { "id": "planillero", "label": "Llamar a Planilleros" }
+  ]
+}
