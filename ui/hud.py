@@ -1,73 +1,44 @@
-"""
-HUD (Heads-Up Display).
-
-Responsabilidad:
-- Mostrar información durante el juego
-- Rol del jugador
-- Tareas pendientes
-- Tiempo y estado actual
-"""
 import pygame
 
 class HUD:
     def __init__(self, screen):
         self.screen = screen
-        self.font_main = pygame.font.SysFont("Verdana", 24, bold=True)
-        self.font_stats = pygame.font.SysFont("Verdana", 16, bold=True)
-        self.font_tarea = pygame.font.SysFont("Arial", 18, bold=True)
-        self.RES_OBJETIVO = (1280, 720)
-        
-        try:
-            img_original = pygame.image.load("assets/images/Fondo_hud.png").convert_alpha()
-            self.fondo_hud = pygame.transform.smoothscale(img_original, self.RES_OBJETIVO)
-        except:
-            self.fondo_hud = pygame.Surface(self.RES_OBJETIVO)
-            self.fondo_hud.fill((30, 30, 35))
+        self.font_main = pygame.font.SysFont("Verdana", 20, bold=True)
+        self.font_small = pygame.font.SysFont("Verdana", 16, bold=True)
 
-    def _draw_text_with_shadow(self, text, font, color, pos):
-        shadow = font.render(text, True, (0, 0, 0))
-        self.screen.blit(shadow, (pos[0] + 2, pos[1] + 2))
-        label = font.render(text, True, color)
-        self.screen.blit(label, pos)
+    def _bar(self, x, y, w, h, value_0_100, label, fg):
+        pygame.draw.rect(self.screen, (25, 25, 25), (x, y, w, h), border_radius=6)
+        fill = int(w * max(0, min(100, value_0_100)) / 100)
+        pygame.draw.rect(self.screen, fg, (x, y, fill, h), border_radius=6)
+        pygame.draw.rect(self.screen, (220, 220, 220), (x, y, w, h), 2, border_radius=6)
+        t = self.font_small.render(f"{label}: {int(value_0_100)}/100", True, (255, 255, 255))
+        self.screen.blit(t, (x, y - 18))
 
-    def draw(self, player_role, task_progress, timer_seconds, score, current_task_name="", sabotajes_list=[]):
-        # 1. Dibujar Fondo
-        self.screen.blit(self.fondo_hud, (0, 0))
-
-        # 2. Panel Superior (Tiempo y Puntos)
-        mins, secs = divmod(timer_seconds, 60)
+    def draw(self, player_role, task_progress, timer_seconds, score, current_task_name,
+             stress, suspicion):
+        # Panel superior simple
+        mins, secs = divmod(int(timer_seconds), 60)
         time_str = f"{mins:02d}:{secs:02d}"
-        self._draw_text_with_shadow(f"TIEMPO: {time_str} | PUNTOS: {score}", 
-                                    self.font_stats, (255, 215, 0), (35, 25))
 
-        # 3. Interfaz según el Rol
-        if player_role == "Impostor":
-            # Pasamos la lista de sabotajes aquí
-            self._draw_impostor_ui(sabotajes_list)
-        else:
-            self._draw_ciudadano_ui(task_progress, current_task_name)
+        line1 = self.font_main.render(f"TIEMPO: {time_str}   PUNTOS: {score}", True, (255, 215, 0))
+        self.screen.blit(line1, (20, 16))
 
-    def _draw_ciudadano_ui(self, progress, task_name):
-        pygame.draw.rect(self.screen, (0, 200, 255), (20, 70, 15, 40), border_radius=4)
-        self._draw_text_with_shadow("DIPUTADO CIUDADANO", self.font_main, (0, 255, 255), (45, 75))
-        self._draw_text_with_shadow(f"TAREA: {task_name}", self.font_tarea, (255, 255, 255), (20, 130))
-        
-        # Barra de progreso
-        pygame.draw.rect(self.screen, (40, 40, 45), (20, 165, 300, 20), border_radius=5)
-        fill_w = int(300 * progress)
-        pygame.draw.rect(self.screen, (50, 205, 50), (20, 165, fill_w, 20), border_radius=5)
+        line2 = self.font_main.render(f"ROL: {player_role}", True, (200, 255, 255))
+        self.screen.blit(line2, (20, 44))
 
-    def _draw_impostor_ui(self, sabotajes):
-        """Dibuja la lista de sabotajes disponibles para el Impostor."""
-        # Título en Rojo
-        pygame.draw.rect(self.screen, (220, 20, 60), (20, 70, 15, 40), border_radius=4)
-        self._draw_text_with_shadow("IMPOSTOR", self.font_main, (255, 50, 50), (45, 75))
-        
-        self._draw_text_with_shadow("SABOTAJES DISPONIBLES:", self.font_stats, (255, 200, 200), (20, 130))
-        
-        # Dibujar cada sabotaje del JSON como texto
-        for i, sabo in enumerate(sabotajes):
-            y_pos = 165 + (i * 35)
-            # Dibujamos el nombre que viene de 'label' en tu JSON
-            texto = f"- {sabo['label']}"
-            self._draw_text_with_shadow(texto, self.font_tarea, (230, 230, 230), (30, y_pos))
+        # Tareas
+        line3 = self.font_small.render(f"TAREA: {current_task_name}", True, (255, 255, 255))
+        self.screen.blit(line3, (20, 74))
+
+        # Progreso tareas (barra)
+        px, py = 20, 102
+        w, h = 260, 16
+        pygame.draw.rect(self.screen, (25, 25, 25), (px, py, w, h), border_radius=6)
+        pygame.draw.rect(self.screen, (50, 205, 50), (px, py, int(w * task_progress), h), border_radius=6)
+        pygame.draw.rect(self.screen, (220, 220, 220), (px, py, w, h), 2, border_radius=6)
+        ptxt = self.font_small.render(f"Tareas: {int(task_progress*100)}%", True, (255, 255, 255))
+        self.screen.blit(ptxt, (px, py + 20))
+
+        # Barras nuevas
+        self._bar(320, 20, 240, 16, stress, "Estrés", (255, 90, 90))
+        self._bar(320, 62, 240, 16, suspicion, "Sospecha", (255, 160, 100))

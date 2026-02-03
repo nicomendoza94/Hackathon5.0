@@ -1,39 +1,9 @@
 {
   "npcs": [
-    {
-      "id": 1,
-      "name": "Diputado Pérez",
-      "x": 300,
-      "y": 250,
-      "is_impostor": false
-    },
-    {
-      "id": 2,
-      "name": "Senador González",
-      "x": 500,
-      "y": 350,
-      "is_impostor": true
-    },
-    {
-      "id": 3,
-      "name": "Diputada Martínez",
-      "x": 700,
-      "y": 450,
-      "is_impostor": false
-    },
-    {
-      "id": 4,
-      "name": "Diputado López",
-      "x": 400,
-      "y": 550,
-      "is_impostor": false
-    },
-    {
-      "id": 5,
-      "name": "Senadora Ramírez",
-      "x": 600,
-      "y": 300,
-      "is_impostor": false
-    }
+    { "id": 1, "name": "Diputado Tereré", "x": 300, "y": 250 },
+    { "id": 2, "name": "Senadora Chipa", "x": 500, "y": 350 },
+    { "id": 3, "name": "Diputada Guaraní", "x": 700, "y": 450 },
+    { "id": 4, "name": "Diputado Coquito", "x": 400, "y": 550 },
+    { "id": 5, "name": "Senador Ñandutí", "x": 600, "y": 300 }
   ]
 }

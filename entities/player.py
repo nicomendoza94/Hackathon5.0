@@ -1,74 +1,61 @@
 """
 Entidad Player (jugador).
 
-Responsabilidades:
-- Mantener el estado del jugador
-- Gestionar progreso de tareas
-- Gestionar score y rol
-- Exponer acciones de gameplay (interactuar, resetear)
+Responsabilidad:
+- Representar al jugador humano
+- Guardar su rol (Ciudadano o Impostor)
+- Posición, movimiento y estado
+- Progreso de tareas
 """
+import random
+import pygame
 
 class Player:
-    CIUDADANO = "Ciudadano"
-    IMPOSTOR = "Impostor"
-
-    def __init__(self, name="Player"):
-        self.name = name
-        self.reset()
-
-    # ----------------------------
-    # Lifecycle
-    # ----------------------------
-    def reset(self):
-        self.role = Player.CIUDADANO
-        self.score = 0
-        self.task_progress = 0.0
-        self.current_task_idx = 0
-
-    def set_role(self, role):
-        self.role = role
-
-    # ----------------------------
-    # Tasks / Gameplay
-    # ----------------------------
-    def can_do_tasks(self):
-        return self.role == Player.CIUDADANO
-
-    def interact_with_task(self, tasks):
-        """
-        Avanza el progreso de la tarea actual.
-        Devuelve True si la tarea fue completada.
-        """
-        if not self.can_do_tasks():
-            return False
-
-        if not tasks:
-            return False
-
-        self.task_progress += 0.25
-
-        if self.task_progress >= 1.0:
-            self.task_progress = 0.0
-            self.complete_task(tasks)
-            return True
-
-        return False
-
-    def complete_task(self, tasks):
-        task = tasks[self.current_task_idx]
-        self.score += task.get("value", 10)
-        self.current_task_idx = (self.current_task_idx + 1) % len(tasks)
-
-    # ----------------------------
-    # Getters (para UI / Game)
-    # ----------------------------
-    def get_score(self):
-        return self.score
-
+    """Representa al jugador humano"""
+    
+    def __init__(self):
+        # Posición inicial (centro del mapa)
+        self.x = 600
+        self.y = 400
+        
+        # Movimiento
+        self.speed = 5
+        self.velocity_x = 0
+        self.velocity_y = 0
+        
+        # Rol del jugador (70% Ciudadano, 30% Impostor)
+        self.role = "Diputado" if random.random() < 0.7 else "Impostor"
+        self.is_impostor = (self.role == "Impostor")
+        
+        # Progreso de tareas
+        self.tasks_completed = 0
+        self.total_tasks = 5
+        
+        # Estado
+        self.is_alive = True
+        self.can_vote = True
+        
+        # Rectángulo para colisiones
+        self.rect = pygame.Rect(self.x - 15, self.y - 15, 30, 30)
+        
+    def update_rect(self):
+        """Actualiza el rectángulo de colisión según la posición"""
+        self.rect.x = self.x - 15
+        self.rect.y = self.y - 15
+    
     def get_task_progress(self):
-        return self.task_progress
-
-    def get_current_task_label(self, tasks):
-        if not tasks or not self.can_do_tasks():
-            return ""
-        return tasks[self.current_task_idx].get("label", "")
+        """Retorna el progreso de tareas como porcentaje (0.0 a 1.0)"""
+        if self.total_tasks == 0:
+            return 0.0
+        return self.tasks_completed / self.total_tasks
+    
+    def complete_task(self):
+        """Marca una tarea como completada"""
+        if self.tasks_completed < self.total_tasks:
+            self.tasks_completed += 1
+    
+    def reset_position(self, x, y):
+        """Cambia la posición del jugador"""
+        self.x = x
+        self.y = y
+        self.update_rect()
