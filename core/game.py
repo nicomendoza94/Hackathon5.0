@@ -90,8 +90,10 @@ class Game:
 
         # Sprites
         # ✅ si querés aún más grande, subí a (80,80) o (96,96)
-        self.player_sprite = _safe_load_image("assets/images/player.png", size=(80, 80), alpha=True)
-        self.npc_sprite = _safe_load_image("assets/images/npc.png", size=(80, 80), alpha=True)
+        # self.player_sprite = _safe_load_image("assets/images/player.png", size=(80, 80), alpha=True)
+        self.player_sprite = _safe_load_image("assets/images/personaje_solo.png", size=(80, 80), alpha=True)
+        # self.npc_sprite = _safe_load_image("assets/images/npc.png", size=(80, 80), alpha=True)
+        self.npc_sprite = _safe_load_image("assets/images/npc_1.png", size=(80, 80), alpha=True)
 
         self.font_hint = pygame.font.SysFont("Verdana", 20, bold=True)
 
