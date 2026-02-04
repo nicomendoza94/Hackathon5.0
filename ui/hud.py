@@ -42,3 +42,16 @@ class HUD:
         # Barras nuevas
         self._bar(320, 20, 240, 16, stress, "Estrés", (255, 90, 90))
         self._bar(320, 62, 240, 16, suspicion, "Sospecha", (255, 160, 100))
+
+        # ==========================
+        # AYUDA CONTEXTUAL
+        # ==========================
+        if player_role == "Impostor":
+            help_text = "Sabotajes: 1 Luces | 2 Puertas | 3 Comms"
+            color = (255, 120, 120)
+        else:
+            help_text = "E: tarea | M: reunión | ESC: salir"
+            color = (200, 200, 255)
+
+        help_surf = self.font_small.render(help_text, True, color)
+        self.screen.blit(help_surf, (20, 140))

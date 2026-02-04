@@ -2,7 +2,6 @@ import random
 import pygame
 from entities.sabotage import Sabotage
 
-
 class SabotageSystem:
     def __init__(self):
         self.sabotages = [
@@ -11,15 +10,28 @@ class SabotageSystem:
             Sabotage("Comunicaciones caídas", "comms", 12),
         ]
 
-        # ✅ MÁS SEGUIDO
-        self.cooldown = 3500        # ms entre intentos
-        self.last_sabotage_time = 0
-        self.trigger_chance = 0.12  # 12% por tick cuando está disponible
+        # Timers fijos (lo que pediste)
+        self.fun_interval_ms = 5000       # eventos graciosos cada 5s
+        self.sabotage_interval_ms = 15000 # sabotajes cada 15s
+
+        self.next_fun_ms = pygame.time.get_ticks() + self.fun_interval_ms
+        self.next_sabotage_ms = pygame.time.get_ticks() + self.sabotage_interval_ms
+        
+        self.manual_cooldown_ms = 15000   # 15s entre sabotajes manuales
+        self.last_manual_time = 0
 
         # Mensajes para UI
         self.ui_messages = []  # list[(text, expires_ms)]
 
-    def _push_ui(self, text, seconds=3.0):
+        # Preferencia: puertas más que el resto
+        # (si querés todavía más, subí el peso de "doors")
+        self.weights = {
+            "doors": 0.60,
+            "lights": 0.25,
+            "comms": 0.15,
+        }
+
+    def _push_ui(self, text, seconds=4.0):
         expires = pygame.time.get_ticks() + int(seconds * 1000)
         self.ui_messages.append((text, expires))
 
@@ -29,24 +41,32 @@ class SabotageSystem:
         return [t for (t, exp) in self.ui_messages]
 
     def update(self, player, npcs, tasks):
-        # Siempre actualizar timers
+        now = pygame.time.get_ticks()
+
+        # Siempre actualizar timers de sabotajes activos
         for s in self.sabotages:
             s.update()
 
-        # Solo el impostor humano dispara sabotajes
-        if not getattr(player, "is_impostor", False):
-            return
+        # ¿Quién puede disparar sabotajes?
+        # - Si el jugador ES impostor => él dispara
+        # - Si el jugador NO es impostor => un NPC impostor dispara
+        impostor_exists = False
+        if player and getattr(player, "is_impostor", False):
+            impostor_exists = True
+        else:
+            if npcs:
+                impostor_exists = any(getattr(n, "is_impostor", False) for n in npcs)
 
-        now = pygame.time.get_ticks()
-
-        can_try = (now - self.last_sabotage_time >= self.cooldown) and (not any(s.active for s in self.sabotages))
-        if can_try and random.random() < self.trigger_chance:
-            self.activate_random_sabotage()
-            self.last_sabotage_time = now
-
-        # ✅ evento cómico más seguido
-        if random.random() < 0.06:
+        # Eventos graciosos fijos cada 5s (siempre)
+        if now >= self.next_fun_ms:
             self.random_fun_event()
+            self.next_fun_ms = now + self.fun_interval_ms
+
+        # Sabotajes cada 15s (solo si existe impostor y no hay uno activo)
+        if impostor_exists and now >= self.next_sabotage_ms:
+            if not any(s.active for s in self.sabotages):
+                self.activate_weighted_sabotage()
+            self.next_sabotage_ms = now + self.sabotage_interval_ms
 
     def random_fun_event(self):
         events = [
@@ -56,12 +76,57 @@ class SabotageSystem:
             "Aparece una bandeja de empanadas de la nada 🥟",
             "Se arma discusión por el aire acondicionado ❄️",
         ]
-        self._push_ui(random.choice(events), seconds=3.0)
+        self._push_ui(random.choice(events), seconds=5.0)
 
-    def activate_random_sabotage(self):
+    def activate_weighted_sabotage(self):
         available = [s for s in self.sabotages if not s.active]
         if not available:
             return
-        sabotage = random.choice(available)
-        sabotage.activate()
-        self._push_ui(f"Sabotaje activado: {sabotage.name} ⚠️", seconds=3.5)
+
+        # elegir por peso (doors más probable)
+        effects = [s.effect for s in available]
+        weights = [self.weights.get(eff, 0.1) for eff in effects]
+
+        chosen_effect = random.choices(effects, weights=weights, k=1)[0]
+        chosen = next(s for s in available if s.effect == chosen_effect)
+
+        chosen.activate()
+        self._push_ui(f"Sabotaje activado: {chosen.name} ⚠️", seconds=6.0)
+
+    def _activate(self, effect):
+        # No permitir si ya hay un sabotaje activo
+        if any(s.active for s in self.sabotages):
+            self._push_ui("Ya hay un sabotaje activo ⛔", seconds=2.2)
+            return False
+
+        now = pygame.time.get_ticks()
+
+        # Cooldown manual
+        if now - self.last_manual_time < self.manual_cooldown_ms:
+            remaining = int((self.manual_cooldown_ms - (now - self.last_manual_time)) / 1000)
+            self._push_ui(f"Sabotaje en cooldown: {remaining}s ⏳", seconds=2.2)
+            return False
+
+        # Activar sabotaje
+        for s in self.sabotages:
+            if s.effect == effect:
+                s.activate()
+                self.last_manual_time = now
+                self._push_ui(f"Sabotaje activado: {s.name} ⚠️", seconds=3.5)
+                return True
+
+        return False
+
+            
+    def manual_trigger(self, key):
+        if key == pygame.K_1:
+            self._activate("lights")
+
+        elif key == pygame.K_2:
+            self._activate("doors")
+
+        elif key == pygame.K_3:
+            self._activate("comms")
+
+
+
