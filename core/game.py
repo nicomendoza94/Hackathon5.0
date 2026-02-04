@@ -93,7 +93,14 @@ class Game:
         # self.player_sprite = _safe_load_image("assets/images/player.png", size=(80, 80), alpha=True)
         self.player_sprite = _safe_load_image("assets/images/personaje_solo.png", size=(80, 80), alpha=True)
         # self.npc_sprite = _safe_load_image("assets/images/npc.png", size=(80, 80), alpha=True)
-        self.npc_sprite = _safe_load_image("assets/images/npc_1.png", size=(80, 80), alpha=True)
+        # self.npc_sprite = _safe_load_image("assets/images/npc_1.png", size=(80, 80), alpha=True)
+        self.npc_sprite = {
+            "npc_1":_safe_load_image("assets/images/npc_1.png", size=(80, 80), alpha=True)
+            ,"npc_2":_safe_load_image("assets/images/npc_2.png", size=(80, 80), alpha=True)
+            ,"npc_3":_safe_load_image("assets/images/npc_3.png", size=(80, 80), alpha=True)
+            ,"npc_4":_safe_load_image("assets/images/npc_4.png", size=(80, 80), alpha=True)
+            ,"npc_5":_safe_load_image("assets/images/npc_5.png", size=(80, 80), alpha=True)
+        }
 
         self.font_hint = pygame.font.SysFont("Verdana", 20, bold=True)
 
@@ -497,20 +504,21 @@ class Game:
             self.screen.fill((40, 40, 45))
 
         # NPCs
-        for npc in self.npcs:
-            if self.npc_sprite:
-                sw = self.npc_sprite.get_width()
-                sh = self.npc_sprite.get_height()
-                self.screen.blit(self.npc_sprite, (int(npc.x - sw // 2), int(npc.y - sh // 2)))
+        for i in range(len(self.npcs)):
+            cur = self.npcs[i]
+            if self.npc_sprite[f"npc_{i+1}"]:
+                sw = self.npc_sprite[f"npc_{i+1}"].get_width()
+                sh = self.npc_sprite[f"npc_{i+1}"].get_height()
+                self.screen.blit(self.npc_sprite[f"npc_{i+1}"], (int(cur.x - sw // 2), int(cur.y - sh // 2)))
 
             else:
-                pygame.draw.circle(self.screen, (0, 140, 255), (int(npc.x), int(npc.y)), 16)
+                pygame.draw.circle(self.screen, (0, 140, 255), (int(cur.x), int(cur.y)), 16)
 
             bar_w, bar_h = 40, 6
-            x = int(npc.x) - bar_w // 2
-            y = int(npc.y) - 30
+            x = int(cur.x) - bar_w // 2
+            y = int(cur.y) - 30
             pygame.draw.rect(self.screen, (30, 30, 30), (x, y, bar_w, bar_h))
-            fill = int(bar_w * (max(0.0, min(100.0, getattr(npc, "suspicion", 0.0))) / 100.0))
+            fill = int(bar_w * (max(0.0, min(100.0, getattr(cur, "suspicion", 0.0))) / 100.0))
             pygame.draw.rect(self.screen, (255, 80, 80), (x, y, fill, bar_h))
 
         # ✅ Player (centrado siempre, no hardcode)
