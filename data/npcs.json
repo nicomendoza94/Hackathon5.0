@@ -1,3 +1,9 @@
 {
-  "npcs": []
+  "npcs": [
+    { "id": 1, "name": "Diputado Tereré", "x": 300, "y": 250 },
+    { "id": 2, "name": "Senadora Chipa", "x": 500, "y": 350 },
+    { "id": 3, "name": "Diputada Guaraní", "x": 700, "y": 450 },
+    { "id": 4, "name": "Diputado Coquito", "x": 400, "y": 550 },
+    { "id": 5, "name": "Senador Ñandutí", "x": 600, "y": 300 }
+  ]
 }

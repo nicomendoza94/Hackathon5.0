@@ -1,4 +1,11 @@
 {
-  "_comment": "Definición de tareas del Congreso",
-  "tasks": []
+  "_comment": "Definición de tareas con coordenadas para 1280x720",
+  "tasks": [
+  { "name": "Firmar presupuesto", "task_type": "sign", "x": 300, "y": 170 },
+  { "name": "Ajustar micrófono",   "task_type": "mic",  "x": 640, "y": 180 },
+  { "name": "Repartir empanadas",  "task_type": "empanadas", "x": 980, "y": 170 },
+
+  { "name": "Revisar informe",     "task_type": "review", "x": 280, "y": 580 },
+  { "name": "No te durmás",        "task_type": "sleep",  "x": 1000, "y": 580 }
+]
 }
